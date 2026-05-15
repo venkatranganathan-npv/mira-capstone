@@ -1,0 +1,100 @@
+{
+  "name": "Mira Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -368,
+        -48
+      ],
+      "id": "c3a9995e-e19a-40c9-a9aa-bdf0b826a9b7",
+      "name": "When chat message received",
+      "webhookId": "3f821cbe-87ee-499d-bac9-a1a4e169bc5e",
+      "notes": "Mira entry point. Receives all user requests and passes \nthem to the Orchestrator for intent classification and \nrouting. Supports compound queries and partial fulfillment."
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a request classifier for Mira, an AI project\nintelligence assistant at Nexora Pvt. Ltd.\n\nAnalyze the user request and return ALL applicable route \nvalues from this list:\nPLAN, RISK, STATUS, MILESTONE, STAKEHOLDER, RESOURCE\n\nAlways return a valid JSON object — nothing else.\nFormat:\n{\n  \"valid_routes\": [\"ROUTE1\", \"ROUTE2\"],\n  \"unknown_requests\": [\"anything not in the list\"],\n  \"action\": \"execute\"\n}\n\nExamples:\n'Generate a project plan'\n→ {\"valid_routes\":[\"PLAN\"],\"unknown_requests\":[],\"action\":\"execute\"}\n\n'Status report and milestone alerts'\n→ {\"valid_routes\":[\"STATUS\",\"MILESTONE\"],\"unknown_requests\":[],\"action\":\"execute\"}\n\n'Milestones and competitive analysis'\n→ {\"valid_routes\":[\"MILESTONE\"],\"unknown_requests\":[\"competitive analysis\"],\"action\":\"execute\"}\n\n'What is the weather today'\n→ {\"valid_routes\":[],\"unknown_requests\":[\"weather\"],\"action\":\"scope_message\"}\n\nRules:\n- Return ONLY the JSON object — no explanation, no markdown\n- Never invent route values outside the list above\n- Never answer out-of-scope requests directly\n- If fully unclear return:\n  {\"valid_routes\":[],\"unknown_requests\":[\"unclear request\"],\"action\":\"unknown\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -160,
+        -48
+      ],
+      "id": "35f6745a-f5b2-409d-a43d-e7793f3d159b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -304,
+        160
+      ],
+      "id": "755bf74d-b2f1-47df-965d-c15924f46d7d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "hWhZYZa7GQ4Eewa1",
+          "name": "OpenAI account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "58a73deb-34df-4030-82f5-9fc5d5354fc0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c21ea6299a31761cbc958033ab5e1a689e95069a8d312eee67ddb5892bb1585e"
+  },
+  "id": "zLprrk5ksBXexkX4",
+  "tags": []
+}
