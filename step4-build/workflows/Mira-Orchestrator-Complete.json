@@ -1,0 +1,951 @@
+{
+  "name": "Mira Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -1312,
+        -2208
+      ],
+      "id": "c3a9995e-e19a-40c9-a9aa-bdf0b826a9b7",
+      "name": "When chat message received",
+      "webhookId": "3f821cbe-87ee-499d-bac9-a1a4e169bc5e",
+      "notes": "Mira entry point. Receives all user requests and passes \nthem to the Orchestrator for intent classification and \nrouting. Supports compound queries and partial fulfillment."
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -368,
+        -1600
+      ],
+      "id": "755bf74d-b2f1-47df-965d-c15924f46d7d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wgHGsX9SLBXUr30p",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "PLAN",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "957ca698-cda4-42e8-9c15-be137a8b0d9b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Planner"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f7f0861f-d385-42ce-8057-bf71ba07351e",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "RISK",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Risk"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d352b0e9-5411-4f1f-b959-d3d58280f00c",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "STATUS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Status"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "177675fd-9cb1-4f35-a88e-cfcfb2187bf3",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "MILESTONE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Milestone"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4e09120e-05f1-4416-90c1-04692ad5ca2a",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "STAKEHOLDER",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Stakeholder"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "61e3e651-4e68-484e-916f-9ed75df159dd",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "RESOURCE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Resource"
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        -1888
+      ],
+      "id": "94ba76f1-4272-4707-a2ac-326742c7ad5a",
+      "name": "Route by Intent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are a request classifier for Mira, an AI project\nintelligence assistant at Nexora Pvt. Ltd.\n\nAnalyze the user request and return ALL applicable route \nvalues from this list:\nPLAN, RISK, STATUS, MILESTONE, STAKEHOLDER, RESOURCE\n\nAlways return a valid JSON object — nothing else.\nFormat:\n{\n  \"valid_routes\": [\"ROUTE1\", \"ROUTE2\"],\n  \"unknown_requests\": [\"anything not in the list\"],\n  \"action\": \"execute\"\n}\n\nExamples:\n'Generate a project plan'\n→ {\"valid_routes\":[\"PLAN\"],\"unknown_requests\":[],\"action\":\"execute\"}\n\n'Status report and milestone alerts'\n→ {\"valid_routes\":[\"STATUS\",\"MILESTONE\"],\"unknown_requests\":[],\"action\":\"execute\"}\n\n'Milestones and competitive analysis'\n→ {\"valid_routes\":[\"MILESTONE\"],\"unknown_requests\":[\"competitive analysis\"],\"action\":\"execute\"}\n\n'What is the weather today'\n→ {\"valid_routes\":[],\"unknown_requests\":[\"weather\"],\"action\":\"scope_message\"}\n\nRules:\n- Return ONLY the JSON object — no explanation, no markdown\n- Never invent route values outside the list above\n- Never answer out-of-scope requests directly\n- If fully unclear return:\n  {\"valid_routes\":[],\"unknown_requests\":[\"unclear request\"],\"action\":\"unknown\"}\n'Which tasks are blocked or at risk of missing deadline'\n→ {\"valid_routes\":[\"MILESTONE\"],\"unknown_requests\":[],\"action\":\"execute\"}\n\n'What milestones are coming up'\n→ {\"valid_routes\":[\"MILESTONE\"],\"unknown_requests\":[],\"action\":\"execute\"}\n\n'Show me blocked tasks'\n→ {\"valid_routes\":[\"MILESTONE\",\"STATUS\"],\"unknown_requests\":[],\"action\":\"execute\"}\n'Show me resource allocation and who is over-allocated'\n→ {\"valid_routes\":[\"RESOURCE\"],\"unknown_requests\":[],\"action\":\"execute\"}\n\n'Generate a stakeholder update email for Sprint 2 progress'\n→ {\"valid_routes\":[\"STAKEHOLDER\"],\"unknown_requests\":[],\"action\":\"execute\"}\n\n'Which milestones are coming up in the next 2 weeks'\n→ {\"valid_routes\":[\"MILESTONE\"],\"unknown_requests\":[],\"action\":\"execute\"}\n\nMILESTONE → \"milestone\", \"deadline\", \"at risk\", \"blocked\", \n            \"missing deadline\", \"overdue\", \"on track\"\nSTAKEHOLDER → \"stakeholder\", \"executive update\", \"email\", \n              \"update email\", \"sprint progress\", \"client update\"\nRESOURCE    → \"resource\", \"allocation\", \"capacity\", \"team load\",\n              \"over-allocated\", \"under-allocated\", \"workload\"\nMILESTONE   → \"milestone\", \"deadline\", \"at risk\", \"blocked\",\n              \"missing deadline\", \"overdue\", \"coming up\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -448,
+        -1824
+      ],
+      "id": "35f6745a-f5b2-409d-a43d-e7793f3d159b",
+      "name": "Mira Intent Classifier"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').first().json.chatInput }}",
+        "options": {
+          "systemMessage": "=You are a project planning assistant for Mira at Nexora Pvt. Ltd.\n\nGenerate a structured project plan using ONLY this data:\n\nPROJECT DESCRIPTION:\n{{ $('Code in JavaScript').item.json.description }}\n\nPROJECT TIMELINE:\n{{ $('Code in JavaScript').item.json.timeline }}\n\nOUTPUT FORMAT:\n## Project Plan — ABCDE Ltd. AI Adoption Project\n\n### Phase 1 — [Phase Name] ([Week Range])\nActivities:\n- [activity 1]\n- [activity 2]\nMilestone: [milestone]\nDeliverable: [deliverable]\n\n[Repeat for all 8 phases]\n\nRULES:\n- Use ONLY data from the fields above\n- Do NOT invent phases, goals, or deliverables\n- If detail is missing write UNKNOWN\n- If input is vague respond: \"Insufficient project detail provided.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1008,
+        -3008
+      ],
+      "id": "3e0bb6fd-6ae8-4557-9da5-68e43f0fa9e2",
+      "name": "Planner Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1088,
+        -2784
+      ],
+      "id": "3dbc1582-afc5-400b-ae63-577c841a2d41",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "wgHGsX9SLBXUr30p",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1qr3PdWpLn_fwysJcyhXg_taIZJABGQbS",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "text",
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1408,
+        -1776
+      ],
+      "id": "4e02f4b2-b921-4077-879f-e00ef4b6e8f3",
+      "name": "Load Description",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "uhRI74eUUUPXXcPU",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "text",
+        "destinationKey": "description",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1200,
+        -1776
+      ],
+      "id": "22bdbb9d-56cf-4111-bd5e-b5304028dbf7",
+      "name": "Extract Description"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1h4HiDN7EA_YL5qFew-RBw3qOx3k5YOFf",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "text",
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1408,
+        -1984
+      ],
+      "id": "e5028f56-3b70-4d1f-97fc-d53dda12b3c1",
+      "name": "Load Timeline",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "uhRI74eUUUPXXcPU",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "text",
+        "destinationKey": "timeline",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1216,
+        -1984
+      ],
+      "id": "31690888-4950-4ff8-ab71-292a799e7746",
+      "name": "Extract Timeline"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1RtsHU5GRJmFqaIE_kZJ8rKeqRLnqSHeR",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "text",
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1376,
+        -1360
+      ],
+      "id": "5eb9baeb-c2cc-4485-8565-820a4e8480e6",
+      "name": "Load Risks",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "uhRI74eUUUPXXcPU",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "text",
+        "destinationKey": "risks",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1136,
+        -1360
+      ],
+      "id": "b4968d8b-1c89-4f16-a38b-743d1950683c",
+      "name": "Extract Risks"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1Bi6MaHiSRkcZJQH2D-dR-CPJXwGYZvfp",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "text",
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1408,
+        -1568
+      ],
+      "id": "41adba4f-49cc-463d-8139-6c7120a19ec6",
+      "name": "Load Task Board",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "uhRI74eUUUPXXcPU",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "text",
+        "destinationKey": "taskboard",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1168,
+        -1568
+      ],
+      "id": "285be1e5-b1e8-42f9-8e4e-210c9f5a548e",
+      "name": "Extract Task Board"
+    },
+    {
+      "parameters": {
+        "jsCode": "const description = $('Extract Description').item.json.description ?? 'No description';\nconst timeline = $('Extract Timeline').item.json.timeline ?? 'No timeline';\nconst risks = $('Extract Risks').item.json.risks ?? 'No risks';\nconst taskboard = $('Extract Task Board').item.json.taskboard ?? 'No task board';\nconst chatInput = $('When chat message received').item.json.chatInput;\nreturn [{ json: { description: description, timeline: timeline, risks: risks, taskboard: taskboard, chatInput: chatInput } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -896,
+        -1824
+      ],
+      "id": "6e155e55-3c4e-490d-8573-88c3ffec049c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').first().json.chatInput }}",
+        "options": {
+          "systemMessage": "=You are a risk assessment assistant for Mira at Nexora Pvt. Ltd.\n\nGenerate a categorized risk matrix using ONLY this data:\n\nPROJECT RISKS:\n{{ $('Code in JavaScript').item.json.risks }}\n\nPROJECT DESCRIPTION:\n{{ $('Code in JavaScript').item.json.description }}\n\nOUTPUT FORMAT:\n## Risk Assessment — ABCDE Ltd. AI Adoption Project\n\n### Risk 1 — [Category]\nChallenge: [description]\nImpact: [impact]\nMitigation: [strategy]\n\n[Repeat for all risks in the data]\n\nRULES:\n- Only use risks explicitly listed in PROJECT RISKS above\n- Never invent risks not in the source data\n- If input is vague respond: \"Insufficient project detail. Please provide project data to proceed.\"\n- Never generate generic risks"
+        }
+      },
+      "id": "9dd61b0f-c744-4fd0-8573-89b02f8e61d0",
+      "name": "Risk Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1008,
+        -2608
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "88db51d7-9354-4d7e-adb5-417c734d6984",
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1088,
+        -2384
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "wgHGsX9SLBXUr30p",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').first().json.chatInput }}",
+        "options": {
+          "systemMessage": "=You are a status reporting assistant for Mira at Nexora Pvt. Ltd.\n\nGenerate a weekly status report using ONLY this data:\n\nTASK BOARD:\n{{ $('Code in JavaScript').item.json.taskboard }}\n\nPROJECT TIMELINE:\n{{ $('Code in JavaScript').item.json.timeline }}\n\nOUTPUT FORMAT:\n## Weekly Status Report — ABCDE Ltd. AI Adoption Project\n\n### Task Summary\nTasks Done: [count] — [task names]\nTasks In Progress: [count] — [task names]\nTasks Blocked: [count] — [task ID + reason]\nTasks To Do: [count]\n\n### Overall Health\nStatus: On Track / At Risk / Critical\nReason: [explanation]\n\n### Blocked Items Requiring Attention\n[List blocked tasks with task ID and reason]\n\n### Upcoming Milestones\n[From timeline data]\n\nRULES:\n- Count tasks EXACTLY as they appear in the task board data\n- Always flag T024 Security Review as BLOCKED explicitly\n- Never invent task names, statuses, or percentages\n- If no task data provided respond: \"No task data available. Cannot generate status report.\"\n- Never fabricate progress percentages"
+        }
+      },
+      "id": "c6c554f9-37b8-40da-aaad-6570f106e125",
+      "name": "Status Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1008,
+        -2208
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "e2a0ff3e-eb42-447c-bbdb-c7e700595040",
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1088,
+        -1984
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "wgHGsX9SLBXUr30p",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').first().json.chatInput }}",
+        "options": {
+          "systemMessage": "=You are a milestone tracking assistant for Mira at Nexora Pvt. Ltd.\n\nCompare timeline and task board to identify at-risk milestones using ONLY this data:\n\nPROJECT TIMELINE:\n{{ $('Code in JavaScript').item.json.timeline }}\n\nTASK BOARD:\n{{ $('Code in JavaScript').item.json.taskboard }}\n\nOUTPUT FORMAT:\n## Milestone Alert Report — ABCDE Ltd. AI Adoption Project\n\n### Upcoming Milestones (Next 2 Weeks)\n[List milestones due soon from timeline]\n\n### At-Risk Milestones\n[List milestones at risk with reason]\n\n### Blocked Tasks Affecting Milestones\n[List blocked tasks and which milestones they impact]\n\n### Recommended Actions\n[Specific actions to address each at-risk milestone]\n\nRULES:\n- Only reference milestones from the timeline data above\n- Always flag T024 Security Review as BLOCKED\n- If no milestones at risk respond: \"No milestones currently at risk based on available data.\"\n- Never invent milestone dates or completion statuses\n- If data insufficient respond: UNKNOWN"
+        }
+      },
+      "id": "804a9523-ab88-4bf2-83c4-1470c35bdde9",
+      "name": "Milestone Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        976,
+        -1840
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "df39796e-f280-4e64-96f5-b2e172906997",
+      "name": "OpenAI Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1056,
+        -1616
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "wgHGsX9SLBXUr30p",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').first().json.chatInput }}",
+        "options": {
+          "systemMessage": "=You are a stakeholder communications assistant for Mira at Nexora Pvt. Ltd.\n\nGenerate a professional stakeholder update email using ONLY this data:\n\nTASK BOARD:\n{{ $('Code in JavaScript').item.json.taskboard }}\n\nPROJECT TIMELINE:\n{{ $('Code in JavaScript').item.json.timeline }}\n\nOUTPUT FORMAT:\nSubject: ABCDE Ltd. AI Adoption Project — Status Update [Sprint/Date]\n\nDear [Audience],\n\nSprint Summary:\n[What was completed this sprint]\n\nCurrent Status: [On Track / At Risk / Critical]\n\nBlockers Requiring Attention:\n[List any blocked tasks]\n\nNext Steps:\n[Upcoming activities]\n\nUpcoming Milestones:\n[From timeline data]\n\nBest regards,\nNexora Project Team\n\nAUDIENCE TYPES:\nEXECUTIVE → high level, outcomes focused, no jargon\nENGINEERING → technical detail, task level, blockers\nCLIENT → professional, progress focused, confident\n\nRULES:\n- Default to EXECUTIVE tone if audience not specified\n- Never invent task completions or percentages\n- Only reference tasks from the provided task board\n- Never include tasks from future sprints\n- If sprint not specified ask: \"Which sprint would you like the update for?\""
+        }
+      },
+      "id": "8ed62e61-0d5e-4382-aeec-7de3dba2e857",
+      "name": "Stakeholder Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        976,
+        -1440
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "c53d0190-ea16-436e-9998-7fb7bddbf4f1",
+      "name": "OpenAI Chat Model5",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1056,
+        -1216
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "wgHGsX9SLBXUr30p",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').first().json.chatInput }}",
+        "options": {
+          "systemMessage": "=You are a resource allocation assistant for Mira at Nexora Pvt. Ltd.\n\nAnalyze task assignments using ONLY this data:\n\nTASK BOARD:\n{{ $('Code in JavaScript').item.json.taskboard }}\n\nOUTPUT FORMAT:\n## Resource Allocation Report — ABCDE Ltd. AI Adoption Project\n\n### Team Member Summary\n[For each assignee:]\nName: [assignee name]\nAssigned Tasks: [count] — [task names]\nStatus: Over-allocated / Balanced / Under-allocated\n\n### Unassigned Tasks\n[Tasks with no assignee — flagged as UNASSIGNED]\n\n### Recommendations\n[Specific rebalancing suggestions based on data]\n\nRULES:\n- Only reference assignees and tasks in the task board data\n- Flag tasks with no assignee as UNASSIGNED\n- Never invent team members or task assignments\n- Never assume workload capacity without data\n- If assignee data missing: \"Assignee data not available\""
+        }
+      },
+      "id": "82cb9702-68eb-4f89-bb48-e5bad1be4e6d",
+      "name": "Resource Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        976,
+        -928
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "a6219c50-b03f-4c86-b1cd-69b1a5b96e9f",
+      "name": "OpenAI Chat Model6",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1056,
+        -704
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "wgHGsX9SLBXUr30p",
+          "name": "OpenAI account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Load Timeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Mira Intent Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Intent": {
+      "main": [
+        [
+          {
+            "node": "Planner Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Risk Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Milestone Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stakeholder Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resource Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mira Intent Classifier": {
+      "main": [
+        [
+          {
+            "node": "Route by Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Planner Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Description": {
+      "main": [
+        [
+          {
+            "node": "Extract Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Timeline": {
+      "main": [
+        [
+          {
+            "node": "Extract Timeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Risks": {
+      "main": [
+        [
+          {
+            "node": "Extract Risks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Task Board": {
+      "main": [
+        [
+          {
+            "node": "Extract Task Board",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Timeline": {
+      "main": [
+        [
+          {
+            "node": "Load Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Risks": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Task Board": {
+      "main": [
+        [
+          {
+            "node": "Load Risks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Description": {
+      "main": [
+        [
+          {
+            "node": "Load Task Board",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Mira Intent Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Risk Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Status Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Milestone Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Stakeholder Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resource Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "023d8c72-ec48-4bfb-92f7-97caa153e5b2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c21ea6299a31761cbc958033ab5e1a689e95069a8d312eee67ddb5892bb1585e"
+  },
+  "nodeGroups": [],
+  "id": "zLprrk5ksBXexkX4",
+  "tags": []
+}
