@@ -9,6 +9,9 @@
 
 Connecting Langfuse observability to the Mira workflow revealed several
 important insights that would not have been visible from outputs alone.
+"Dynamic chatInput interpolation in Langfuse HTTP body 
+is a planned fix — current implementation uses static 
+query field due to n8n Raw body expression constraints"
 
 ### What the Traces Showed
 
